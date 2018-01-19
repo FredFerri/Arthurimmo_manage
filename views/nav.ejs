@@ -1,0 +1,56 @@
+<nav class="navbar header-navbar pcoded-header">
+    <div class="navbar-wrapper" style="display: flex; align-items: center;">
+
+        <div class="navbar-logo">
+            <a href="/home">
+                <img class="img-fluid" src="images/logo.png" alt="Theme-Logo" width="50"/>
+            </a>
+            <a class="logout" href="/logout" title="Se déconnecter">
+                <img class="logout_img" src="images/logout.png" width="34"/>
+            </a>
+        </div>
+
+        <div class="navbar-container">
+            <ul class="nav-left">
+                <li>
+                    <div class="sidebar_toggle"><a href="javascript:void(0)"><i class="ti-menu"></i></a></div>
+                </li>
+            </ul>
+
+
+        <% include add_form.ejs %>
+        <% include edit_delete_form.ejs %>
+        <% include contact_form.ejs %>
+
+        <ul class="nav-right">
+            <div class="setting_container">
+
+                <span class="settings_txt">Ajouter et modifier une agence</span>
+                <a class="settings" href="#!">
+                    <li class="user-profile header-notification">
+                        <i class="ti-settings ti-"></i>
+                    </li>
+                </a>
+                <ul id="settings-option" class="show-notification">
+                    <li>
+                        <a style="font-size: 14px" href="#" id="add_agence_btn" class="modal-sm md-effect-7" data-toggle="modal" data-target="#default-Modal">
+                            Ajouter une agence
+                        </a>
+                    </li>
+                    <li>
+                        <a style="font-size: 14px" href="#" id="edit_agence_btn" class="modal-sm md-effect-7" data-toggle="modal" data-target="#edit_delete-Modal">
+                            Modifier et supprimer une agence
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sendmail_container sendmail modal-sm md-effect-7" data-toggle="modal" data-target="#sendmail-Modal">
+			    <span class="settings_txt">Nous contacter</span>
+                <i class="ti-email"></i>
+            </div>
+
+        </ul>
+        </div>
+    </div>
+</nav>

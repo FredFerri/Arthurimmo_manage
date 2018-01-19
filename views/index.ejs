@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Kel Quartier</title>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <!-- Meta -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="description" content="CodedThemes">
+      <meta name="keywords" content=" Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
+      <meta name="author" content="CodedThemes">
+      <!-- Favicon icon -->
+      <link rel="icon" href="images/favicon-16x16.png" type="image/x-icon">
+      <!-- Google font-->
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
+      <!-- Required Fremwork -->
+      <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+      <!-- themify-icons line icon -->
+      <link rel="stylesheet" type="text/css" href="css/themify-icons/themify-icons.css">
+      <!-- ico font -->
+      <link rel="stylesheet" type="text/css" href="css/icofont/css/icofont.css">
+      <!-- Style.css -->
+      <link rel="stylesheet" type="text/css" href="css/style.css">
+      <!--<link rel="stylesheet" type="text/css" href="css/jquery.mCustomScrollbar.css">-->
+	  <link rel="stylesheet" type="text/css" href="css/datatables/dataTables.bootstrap.min.css">
+	  <link rel="stylesheet" type="text/css" href="css/datatables/buttons.bootstrap.min.css">
+	  <link rel="stylesheet" type="text/css" href="css/datatables/responsive.dataTables.css">
+	  <link rel="stylesheet" type="text/css" href="css/colorpicker.css">
+	  <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
+
+	  <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+	  <script type="text/javascript" src="js/jquery-ui/jquery-ui.min.js"></script>
+	  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing,places&key=AIzaSyC_UYwcikkuBS4rwCJgA6f_gy39cpanQjU"></script>
+	  <!--<script type="text/javascript" src="js/markerwithlabel_packed.js"></script>-->
+	  <script type="text/javascript" src="js/markerwithlabel.js"></script>
+
+	  
+		<script>
+			var map;
+			var tabPolygones = new Array();
+			var tabSelections = new Array();
+			var oTable;
+			var agences = <%- JSON.stringify(agences) %>;
+			var tabAgenceInfos = new Array();
+			var tabDeletedPolys = new Array();
+			var tabZoneInfos = new Array();
+			var lastClickedPoly;
+			var lat;
+			var lng;
+			var dpt;
+			var markers = new Array();
+			var session_mode;
+
+			var oLatLngDefault = new google.maps.LatLng(46.461309, 2.918557);
+			var iZoomDefault = 6;
+
+			jQuery(document).ready(function() {
+				google.maps.event.addDomListener(window, 'load', initializeMap);
+				setTimeout(function() {
+					google.maps.event.addDomListener(window, 'load', displayMarkers(agences));
+
+					loadAutocomplete();
+
+				},500);
+			});
+
+            function onPlaceChanged() {
+                var place = this.getPlace();
+                if (!place.geometry) return;
+
+                /* sauvegarde historique */
+                var sAdresse = place.formatted_address;
+                lat = place.geometry.location.lat();
+                lng = place.geometry.location.lng();
+                index = place.address_components.length - 1;
+                dpt = place.address_components[index].short_name.substr(0, 2);
+                var ville = place.vicinity.toUpperCase();
+                $('#agence_cp').val(dpt);
+                $('#agence_ville').val(ville);
+                // centrer la carte
+                initializeMap();
+                var center = new google.maps.LatLng(lat, lng);
+                // using global variable:
+                map.setCenter(center);
+                map.setZoom(16);
+            }
+
+		</script>
+	  
+  </head>
+
+  <body>
+
+    <!-- Pre-loader start -->
+    <div class="theme-loader">
+        <div class="ball-scale">
+            <div class='contain'>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+                <div class="ring">
+                    <div class="frame"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Pre-loader end -->
+    <div id="pcoded" class="pcoded">
+        <div class="pcoded-overlay-box"></div>
+        <div class="pcoded-container navbar-wrapper">
+
+            <% include nav.ejs %>
+
+            <div class="pcoded-main-container">
+                <div class="pcoded-wrapper">
+                    <nav class="pcoded-navbar">
+
+                        <div class="list-agences-block">
+                            <span class="agences-form_txt">Sélectionner une agence Arthurimmo.com :</span>
+                            <form id="agences-form" method="post" action="/">
+                                <select name="agence_id" id="lst_agences" onchange="return selectAgence();">
+                                    <option value="--" selected="selected">--</option>
+                                    <% agences.forEach(function(agence) { %>
+                                    <option value="<%= agence.id_agence %>"><%= agence.departement %> - <%= agence.ville %> - <%= agence.libelle %></option>
+                                    <% }) %>
+                                </select>
+                            </form>
+                        </div>
+
+                        <div class="sidebar_toggle"><a href="#"><i class="icon-close icons"></i></a></div>
+						<div style="display:none;" class="agence-block card">
+							<div class="card-header">
+								<h5>Zones sélectionnées</h5>
+								<div class="card-header-right">
+									<ul class="list-unstyled card-option">
+										<li>
+											<i class="icofont icofont-minus minimize-card"></i>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="card-block table-border-style">
+								<div class="table-responsive">
+									<table id="agence-table" class="table table-striped table-bordered display" width="100%" cellspacing="0">
+									</table>
+								</div>
+							</div>
+						</div>			
+                    </nav>
+                    <!-- Google Map -->
+                    <div id="gmap_container">
+                        <div id="gmap" class="pcoded-content">
+                        </div>
+                        <div id="gmap_logo">
+                            <img src="/images/kelquartier_logo_complet.png" style="position: absolute; bottom: 0; margin-left: 503px;" width="115">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+<script type="text/javascript" src="js/popper.js/popper.min.js"></script>
+<script type="text/javascript" src="js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="js/script.js"></script>
+<script src="js/pcoded.min.js"></script>
+<script src="js/demo-12.js"></script>
+<script src="js/colorpicker/js/colorpicker.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="js/init.js"></script>
+<script src="js/datatables/datatables.min.js"></script>
+<script src="js/datatables/dataTables.fixedHeader.min.js"></script>
+<script src="js/datatables/buttons.bootstrap.min.js"></script>
+
+<script>
+// Connexion à socket.io
+var socket = io.connect('http://###.##.#.##:8080');
+
+var $window = $(window);
+var nav = $('.fixed-button');
+    $window.scroll(function(){
+        if ($window.scrollTop() >= 200) {
+         nav.addClass('active');
+     }
+     else {
+         nav.removeClass('active');
+     }
+ });
+
+
+function selectAgence(id) {
+    // Dans le cas ou la selection se fait au click sur un marker
+    if (id) {
+        var agence_id = id;
+        $('#lst_agences').val(agence_id);
+    }
+    // Sinon, c'est que la selection s'est faite via la barre de selection (à gauche)
+    else {
+        var agence_id = $("#lst_agences").val();
+    }
+	// On vérifie que l'option selectionnée n'est pas celle par défaut (vide)
+	if (agence_id != '--') {
+        socket.emit('selectAgence', agence_id);
+        $('#preloader_container').dialog({
+            modal: true,
+            resizable: false
+        });
+        $('body').css('opacity', '0.7');
+    }
+    else {
+        location.reload();
+    }
+    return false;
+};
+
+// Fonction déclenchée à la réception des infos concernant une agence et ses polygones
+socket.on('agenceDatas', function(datas) {
+	tabAgenceInfos = [];
+	// Liste des polygones appartenant à l'agence
+	var agenceInfos = datas.agenceInfos;
+	// Liste des polygones étant dans la zone mais n'appartenent pas à l'agence
+	zoneInfos = datas.zoneInfos;
+    // Liste de tous les polygones de la zone
+	var datas = datas.datas;
+	var totalHab = 0;
+	var totalHlm = 0;
+	// On stocke les infos dans des tableaux pour pouvoir faire les manipulation
+	// liés aux clicks de l'utilisateur
+	for (var i=0; i<agenceInfos.length; i++) {
+	    var hab = agenceInfos[i][3];
+	    var hlm = agenceInfos[i][4];
+		tabAgenceInfos[agenceInfos[i][5]] = agenceInfos[i];
+		totalHab += parseInt(hab, 10);
+		totalHlm += parseInt(hlm, 10);
+	}
+	if (totalHlm !== 0) {
+	    totalHlm = Math.round(totalHlm / agenceInfos.length) + ' %';
+    }
+	for (var y=0; y<zoneInfos.length; y++) {
+		tabZoneInfos[zoneInfos[y][5]] = zoneInfos[y];
+	}
+
+	// On fait apparaitre les infos dans la barre de gauche
+	$('.sidebar-txt').hide('slow');
+	var agence_id = $("#lst_agences").val();
+	if (typeof oTable != 'undefined') {
+		oTable.destroy();
+	}
+	oTable = $('#agence-table').DataTable( {
+		data: agenceInfos,
+        "language": {
+		    "url": '/js/datatables/frenchTranslations.json'
+        },
+		columns: [
+            { title: "CP" },
+            { title: "Commune" },
+            { title: "Quartier" },
+            { title: "Habitants" },
+            { title: "% HLM" }
+		],
+		"lengthChange": false
+	} );
+	$('.agence-block').show('slow');
+	// On affiche le total calculé des habitants et du pourcentage d'HLM
+	var total_infos = '<div class="agence-totals"><div class="table-responsive"><div id="total_habs"><strong>Total d\'habitants :</strong><span id="habs_num"> ' +totalHab+'</span></div><div id="total_hlm"><strong>Pourcentage moyen d\'HLM :</strong><span id="hlm_num"> ' +totalHlm+'</span></div></div></div>'
+	var foot_note = '<div class="agence_footnote">ZP : zone potentielle, ZI : zone interdite</div>';
+    setTimeout(function () {
+        $('#agence-table_filter').after(total_infos);
+		$('.agence-totals').after(foot_note);
+    }, 2000);
+	displayAllPolygones(datas, agence_id);
+    $('#preloader_container').dialog( "close" );
+    $('body').css('opacity', '1');
+});
+
+// Récupération de données après que l'utilisateur ait cliqué sur un polygone
+socket.on('updatedDatas', function(updated_poly) {
+	tabPolygones[updated_poly.id_polygone].setOptions({fillColor:updated_poly.couleur});
+	tabPolygones[updated_poly.id_polygone].id_agence = updated_poly.id_agence;
+	tabPolygones[updated_poly.id_polygone].couleur_origine = updated_poly.couleur;
+	var idSelectedPoly = updated_poly.id_polygone;
+	// Si on click sur un polygone appartenant à l'agence
+	if (tabAgenceInfos[idSelectedPoly] != null) {
+		var deletedPoly = tabAgenceInfos[idSelectedPoly];
+		tabAgenceInfos[idSelectedPoly] = null;
+		tabDeletedPolys[idSelectedPoly] = deletedPoly;
+	}
+	else {
+		// Si on click sur un polygone que l'on a déselctionné précédemment
+		if (tabDeletedPolys[idSelectedPoly] != null) {
+			var reintegratedPoly = tabDeletedPolys[idSelectedPoly];
+			tabDeletedPolys[idSelectedPoly] = null;
+			tabAgenceInfos[idSelectedPoly] = reintegratedPoly;
+		}
+		// Sinon: on vient de clicker sur un polygone qui n'appartenait pas à l'agence
+		else {
+			tabAgenceInfos[idSelectedPoly] = tabZoneInfos[idSelectedPoly];
+		}
+	};
+	// Mise à jour du calcul du total des habitants et du pourcentage moyen d'HLM
+    var totalHab = 0;
+    var totalHlm = 0;
+    var totalSelectedPolys = 0;
+    for (var key in tabAgenceInfos) {
+        if (tabAgenceInfos[key] !== null) {
+            totalHab += parseInt(tabAgenceInfos[key][3], 10);
+            totalHlm += parseInt(tabAgenceInfos[key][4], 10);
+            ++totalSelectedPolys;
+        }
+    }
+    if (totalHlm !== 0) {
+        totalHlm = Math.round(totalHlm / totalSelectedPolys) + ' %';
+    }
+
+    // Mise à jour de l'affichage des données dans la colonne de gauche
+	var orderedTabAgences = array_values(tabAgenceInfos);
+	oTable.destroy();
+	oTable = $('#agence-table').DataTable( {
+	data: orderedTabAgences,
+        "language": {
+            "url": '/js/datatables/frenchTranslations.json'
+        },
+	columns: [
+		{ title: "CP" },
+		{ title: "Commune" },
+		{ title: "Quartier" },
+		{ title: "Habitants" },
+		{ title: "% HLM" }
+	],
+	"lengthChange": false
+	});
+	// Affichage du total des habitants et du pourcentage moyen d'HLM
+    var total_infos = '<div class="agence-totals"><div class="table-responsive"><div id="total_habs"><strong>Total d\'habitants :</strong><span id="habs_num"> ' +totalHab+'</span></div><div id="total_hlm"><strong>Pourcentage moyen d\'HLM :</strong><span id="hlm_num"> ' +totalHlm+'</span></div></div></div>'
+	var foot_note = '<div class="agence_footnote">ZP : zone potentielle, ZI : zone interdite</div>';
+    setTimeout(function () {
+        $('#agence-table_filter').after(total_infos);
+        $('.agence-totals').after(foot_note);
+    }, 100)
+});
+
+// Lié à la selection d'un polygone
+function preparePoly(oPolygone) {
+	var parameters = {};
+	parameters.mode = 'normal';
+	parameters.selectedAgence = $("#lst_agences").val();
+	parameters.id_agence = oPolygone.id_agence;
+	parameters.id_polygone = oPolygone.id_polygone;
+	parameters.couleur = oPolygone.couleur_origine;
+	lastClickedPoly = parameters;
+	socket.emit('updatePoly', parameters);
+}
+
+
+// Annulation de la dernière selection de polygone (se déclenche au click droit)
+function cancelClick(oPolygone) {
+	if (lastClickedPoly != null) {
+		prepareCancelPoly(lastClickedPoly);
+	}
+	lastClickedPoly = null;
+}
+
+function prepareCancelPoly(lastClickedPoly) {
+    lastClickedPoly.mode = 'cancel';
+    socket.emit('updatePoly', lastClickedPoly);
+}
+
+
+// Animation sur les modals
+var origin_height;
+
+$('#add_agence_modal .icofont-minus').click(function () {
+    if ($(this).hasClass('icofont-plus')) {
+        $('#add_agence_modal').animate({height: origin_height},300)
+    }
+    else {
+        origin_height = $('#add_agence_modal').height();
+        $('#add_agence_modal').animate({height: '80px'},300);
+    }
+})
+
+jQuery(document).ready(function($) {
+    $(window).load(function(){
+        $('#preloader').fadeOut('slow',function(){$(this).remove();});
+    });
+});
+
+// Fonctions liées à la palette de couleurs (colorPicker)
+$('#agence_color').ColorPicker({
+    onChange: function (hsb, hex, rgb, el) {
+        $('#agence_color').val('#'+hex);
+    }
+});
+
+$('#edit_agence_color').ColorPicker({
+    onChange: function (hsb, hex, rgb, el) {
+        $('#edit_agence_color').val('#'+hex);
+    }
+});
+
+
+
+// Recentrage de la google map en cas de redimensionnement de la fenetre
+google.maps.event.addDomListener(window, "resize", function() {
+    $('#gmap').css('width', $('#td_carte').css('width')-$('#div-tableau').css('width'));
+    $('#gmap').css('height', $('#td_carte').css('height'));
+    var center = map.getCenter();
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(center);
+});
+
+// Définition de la valeur par défaut du form de selection d'agence (pour firefox)
+$(document).ready(function () {
+    $('#lst_agences').val('--');
+});
+
+<!-- setTimeout(function () { -->
+    <!-- <!-- $('#gmap img[src^="https://maps.gstatic.com"]').hide(); --> -->
+<!-- },3000); -->
+    
+</script>
+
+</div>
+</body>
+
+<!-- Préloader déclenché lors de la sélection d'une agence -->
+<div id="preloader_container" style="display: none; font-size: 100%; z-index: 9999; width: 300px; height: 100px;">
+    <div style="margin-left: auto; margin-right: auto; width: 270px; height: 100px; text-align: center; padding-top: 40px;">
+        <div id="preloader"></div>
+    </div>
+</div>
+
+<script>
+
+</script>
+
+<% if (session_mode) { %>
+    <script>
+        session_mode = '<%= session_mode %>';
+        if (session_mode == 'logged_visitor') {
+            $('.settings_txt').hide();
+            $('.settings').hide();
+        }
+    </script>
+<% } %>
+
+</html>
+

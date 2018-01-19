@@ -1,0 +1,86 @@
+<div id="default-Modal" class="modal fade add_agence_modal" tabindex="-1" role="dialog" style="z-index: 1050; display: none;" aria-hidden="true">
+    <div id="add_agence_modal" class="modal-dialog card" role="document">
+        <div class="modal-content">
+            <div class="modal-header card-header">
+                <h4 id="add_agence_title" class="modal-title">Entrez l'adresse de la nouvelle agence</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="card-header-right">
+                    <ul class="list-unstyled card-option" style="width: 180px;">
+                        <li class="">
+                            <i class="icofont icofont-minus minimize-card"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-body card-block">
+                <div id="add_agence_form">
+                    <div id="div_recherche" class="form-group row col-sm-12">
+                        <div class="radios"><input class="agence_type" name="type" type="radio" value="agence" checked>Agence</div>
+                        <div class="radios"><input class="agence_type" name="type" type="radio" value="zone_potentielle">Zone potentielle</div>
+                        <div class="radios"><input class="agence_type" name="type" type="radio" value="zone_interdite">Zone interdite</div>
+                    </div>
+                    <div id="div_recherche" class="form-group row col-sm-12">
+                        <label class="col-form-label">Adresse</label>
+                        <input class="form-control" id="agence_adresse" name="adresse" type="text" autocomplete="off" required="required">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Ville</label>
+                        <input class="form-control" id="agence_ville" name="ville" type="text" autocomplete="off" required="required">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Nom de l'agence</label>
+                        <input class="form-control" id="agence_name" name="name" type="text" required="required">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Departement</label>
+                        <input class="form-control" id="agence_cp" name="cp" type="text" required="required" maxlength="2">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Téléphone</label>
+                        <input class="form-control" id="agence_tel" name="tel" type="text" maxlength="10">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Fax</label>
+                        <input class="form-control" id="agence_fax" name="fax" type="text" maxlength="10">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Email</label>
+                        <input class="form-control" id="agence_mail" name="mail" type="email">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" style="display: none">
+                        <label class="col-form-label">Responsable d'agence (prénom et nom)</label>
+                        <input class="form-control" id="agence_resp" name="resp" type="text">
+                    </div>
+                    <div class="form-group row col-sm-12 agence_infos_comps" id="agence_color_block" style="display: none">
+                        <label class="col-form-label">Couleur</label>
+                        <input class="form-control" id="agence_color" name="color" type="text" required="required" maxlength="7">
+                    </div>
+                    <div class="modal-footer">
+                        <button id="add_agence_close" class="btn btn-default waves-effect " type="button" data-dismiss="modal">Annuler</button>
+                        <button id="select_adresse" class="btn btn-primary waves-effect waves-light" onclick="return selectAdresse()">Valider</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sweet-alert showSweetAlert visible" id="agence_confirmation_block" data-custom-class="" data-has-cancel-button="false"
+     data-has-confirm-button="true" data-allow-outside-click="false" data-has-done-function="false"
+     data-animation="pop" data-timer="null" style="display: none; margin-top: -172px;">
+    <div class="sa-icon sa-error" style="display: none;">
+        <span class="sa-x-mark">
+            <span class="sa-line sa-left"></span>
+            <span class="sa-line sa-right"></span>
+        </span>
+    </div>
+    <div class="sa-icon sa-success animate" style="display: none;">
+        <span class="sa-line sa-tip animateSuccessTip"></span>
+        <span class="sa-line sa-long animateSuccessLong"></span>
+        <div class="sa-placeholder"></div>
+        <div class="sa-fix"></div>
+    </div>
+    <h3 id="agence_confirmation"></h3>
+</div>

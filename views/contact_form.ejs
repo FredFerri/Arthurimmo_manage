@@ -1,0 +1,28 @@
+<div id="sendmail-Modal" class="modal fade contact_modal" tabindex="-1" role="dialog" style="z-index: 1050; display: none;" aria-hidden="true">
+    <div id="contact_modal" class="modal-dialog card" role="document">
+        <div class="modal-content">
+            <div class="modal-header card-header">
+                <h4 id="contact_title" class="modal-title">Nous contacter</h4>
+            </div>
+            <div class="modal-body card-block">
+                <div id="contact_form_container">
+                    <form id="contact_form" action="">
+                        <div id="response_message" style="display: none"></div>
+                        <div class="form-group row col-sm-12">
+                            <input type="email" id="form_email" class="form-control" name="email" placeholder="Votre adresse email">
+                        </div>
+
+                        <div class="form-group row col-sm-12">
+                            <textarea id="form_message" class="form-control" name="message" placeholder="Votre message"></textarea>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="sendmail_close" class="btn btn-default waves-effect " type="button" data-dismiss="modal">Annuler</button>
+                            <button id="sendmail_submit" type="button" class="btn btn-primary waves-effect waves-light" onclick="return sendMail();">Envoyer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
